@@ -7,8 +7,10 @@
 //#pragma multi_compile _IS_CLIPPING_OFF _IS_CLIPPING_MODE  _IS_CLIPPING_TRANSMODE
 //#pragma multi_compile _IS_PASS_FWDBASE _IS_PASS_FWDDELTA
 //
+#include "UCTS_Function.cginc"
 #include "UCTS_HighColorLighting.cginc"
 #include "UCTS_RimLighting.cginc"
+#include "UCTS_MatCapLighting.cginc"
 
             uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
             uniform float4 _BaseColor;
@@ -41,28 +43,18 @@
             uniform fixed _Is_NormalMapToRimLight;
 
             uniform fixed _MatCap;
-            uniform sampler2D _MatCap_Sampler; uniform float4 _MatCap_Sampler_ST;
-            uniform float4 _MatCapColor;
-            uniform fixed _Is_LightColor_MatCap;
             uniform fixed _Is_BlendAddToMatCap;
-            uniform float _Tweak_MatCapUV;
-            uniform float _Rotate_MatCapUV;
             uniform fixed _Is_NormalMapForMatCap;
             uniform sampler2D _NormalMapForMatCap; uniform float4 _NormalMapForMatCap_ST;
             uniform float _Rotate_NormalMapForMatCapUV;
             uniform fixed _Is_UseTweakMatCapOnShadow;
             uniform float _TweakMatCapOnShadow;
-            //MatcapMask
-            uniform sampler2D _Set_MatcapMask; uniform float4 _Set_MatcapMask_ST;
-            uniform float _Tweak_MatcapMaskLevel;
             //v.2.0.5
             uniform fixed _Is_Ortho;
             //v.2.0.6
-            uniform float _CameraRolling_Stabilizer;
-            uniform fixed _BlurLevelMatcap;
-            uniform fixed _Inverse_MatcapMask;
             uniform float _BumpScale;
             uniform float _BumpScaleMatcap;
+
             //Emissive
             uniform sampler2D _Emissive_Tex; uniform float4 _Emissive_Tex_ST;
             uniform float4 _Emissive_Color;
@@ -107,25 +99,7 @@
 //DoubleShadeWithFeather
 #endif
 
-            // UV回転をする関数：RotateUV()
-            //float2 rotatedUV = RotateUV(i.uv0, (_angular_Verocity*3.141592654), float2(0.5, 0.5), _Time.g);
-            float2 RotateUV(float2 _uv, float _radian, float2 _piv, float _time)
-            {
-                float RotateUV_ang = _radian;
-                float RotateUV_cos = cos(_time*RotateUV_ang);
-                float RotateUV_sin = sin(_time*RotateUV_ang);
-                return (mul(_uv - _piv, float2x2( RotateUV_cos, -RotateUV_sin, RotateUV_sin, RotateUV_cos)) + _piv);
-            }
-
-            float3 UTS_UnityWorldToViewDir(float3 dirWS)
-            {
-                return mul((float3x3)UNITY_MATRIX_V, dirWS).xyz;
-            }
-
-            //
-            fixed3 DecodeLightProbe( fixed3 N ){
-            return ShadeSH9(float4(N,1));
-            }
+            
             
             uniform float _GI_Intensity;
 
@@ -156,7 +130,6 @@
                 o.tangentDir = normalize( mul( unity_ObjectToWorld, float4( v.tangent.xyz, 0.0 ) ).xyz );
                 o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
                 o.posWorld = mul(unity_ObjectToWorld, v.vertex);
-                float3 lightColor = _LightColor0.rgb;
                 o.pos = UnityObjectToClipPos( v.vertex );
                 //v.2.0.7 鏡の中判定（右手座標系か、左手座標系かの判定）o.mirrorFlag = -1 なら鏡の中.
                 float3 crossFwd = cross(UNITY_MATRIX_V[0], UNITY_MATRIX_V[1]);
@@ -398,36 +371,6 @@
     //v.2.0.7
     fixed _sign_Mirror = i.mirrorFlag;
     //
-    float3 _Camera_Right = UNITY_MATRIX_V[0].xyz;
-    float3 _Camera_Front = UNITY_MATRIX_V[2].xyz;
-    float3 _Up_Unit = float3(0, 1, 0);
-    float3 _Right_Axis = cross(_Camera_Front, _Up_Unit);
-    //鏡の中なら反転.
-    if (_sign_Mirror < 0)
-    {
-        _Right_Axis = -1 * _Right_Axis;
-        _Rotate_MatCapUV = -1 * _Rotate_MatCapUV;
-    }
-    else
-    {
-        _Right_Axis = _Right_Axis;
-    }
-    //_Camera_Right_Magnitudeは常に１になる。謎
-    float _Camera_Right_Magnitude = length(_Camera_Right.xyz);
-    float _Right_Axis_Magnitude = length(_Right_Axis.xyz);
-    float _Camera_Roll_Cos = dot(_Right_Axis, _Camera_Right) / (_Right_Axis_Magnitude * _Camera_Right_Magnitude);
-    float _Camera_Roll = acos(clamp(_Camera_Roll_Cos, -1, 1));
-    fixed _Camera_Dir = _Camera_Right.y < 0 ? -1 : 1;
-    float _Rot_MatCapUV_var_ang;
-    if (_CameraRolling_Stabilizer)
-    {
-        _Rot_MatCapUV_var_ang = _Rotate_MatCapUV * 3.141592654 - _Camera_Dir * _Camera_Roll;
-    }
-    else
-    {
-        _Rot_MatCapUV_var_ang = _Rotate_MatCapUV * 3.141592654;
-    }
-    //v.2.0.7
     float2 _Rot_MatCapNmUV_var = RotateUV(Set_UV0, (_Rotate_NormalMapForMatCapUV * 3.141592654), float2(0.5, 0.5), 1.0);
     //V.2.0.6
     float3 _NormalMapForMatCap_var = UnpackScaleNormal(tex2D(_NormalMapForMatCap,TRANSFORM_TEX(_Rot_MatCapNmUV_var, _NormalMapForMatCap)),_BumpScaleMatcap);
@@ -456,47 +399,8 @@
     {
         _ViewNormalAsMatCapUV = noSknewViewNormal.xy * 0.5 + 0.5;
     }
-    //v.2.0.7
-    //(0.5,0.5)を基準に_Rotate_NormalMapForMatCapUV×π回転させる。
-    float2 _Rot_MatCapUV_var = RotateUV((_ViewNormalAsMatCapUV - _Tweak_MatCapUV) / (1.0 - 2 * _Tweak_MatCapUV),
-                                        _Rot_MatCapUV_var_ang, float2(0.5, 0.5), 1.0);
-    //鏡の中ならUV左右反転.
-    if (_sign_Mirror < 0)
-    {
-        _Rot_MatCapUV_var.x = 1 - _Rot_MatCapUV_var.x;
-    }
-    else
-    {
-        _Rot_MatCapUV_var = _Rot_MatCapUV_var;
-    }
-    //v.2.0.6 : LOD of Matcap
-    float4 _MatCap_Sampler_var = tex2Dlod(_MatCap_Sampler,
-                                          float4(
-                                              TRANSFORM_TEX(_Rot_MatCapUV_var, _MatCap_Sampler), 0.0,
-                                              _BlurLevelMatcap));
-    //
-    //MatcapMask
-    float4 _Set_MatcapMask_var = tex2D(_Set_MatcapMask,TRANSFORM_TEX(Set_UV0, _Set_MatcapMask));
-    float _Tweak_MatcapMaskLevel_var = saturate(
-        lerp(_Set_MatcapMask_var.g, (1.0 - _Set_MatcapMask_var.g), _Inverse_MatcapMask) + _Tweak_MatcapMaskLevel);
-    if (_Inverse_MatcapMask)
-    {
-        _Tweak_MatcapMaskLevel_var = saturate((1.0 - _Set_MatcapMask_var.g) + _Tweak_MatcapMaskLevel);
-    }
-    else
-    {
-        _Tweak_MatcapMaskLevel_var = saturate(_Set_MatcapMask_var.g + _Tweak_MatcapMaskLevel);
-    }
-    //
-    float3 _Is_LightColor_MatCap_var;
-    if (_Is_LightColor_MatCap)
-    {
-        _Is_LightColor_MatCap_var = (_MatCap_Sampler_var.rgb * _MatCapColor.rgb) * Set_LightColor;
-    }
-    else
-    {
-        _Is_LightColor_MatCap_var = _MatCap_Sampler_var.rgb * _MatCapColor.rgb;
-    }
+    UTSMatCapStruct uts_mat_cap_struct = MatCapColorCalc( Set_UV0, _sign_Mirror, _ViewNormalAsMatCapUV, Set_LightColor);
+    
     //v.2.0.6 : ShadowMask on Matcap in Blend mode : multiply
     float3 Set_MatCap;
     float _Tweak_MatcapMaskLevel_var_MultiplyMode;
@@ -504,20 +408,20 @@
     {
         if (_Is_BlendAddToMatCap)
         {
-            Set_MatCap = _Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask);
+            Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask);
         }
         else
         {
-            Set_MatCap = _Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask) + Set_HighColor
+            Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask) + Set_HighColor
                 * Set_FinalShadowMask * (1.0 - _TweakMatCapOnShadow);
         }
-        _Tweak_MatcapMaskLevel_var_MultiplyMode = _Tweak_MatcapMaskLevel_var * (1.0 - Set_FinalShadowMask * (1.0 -
+        _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var * (1.0 - Set_FinalShadowMask * (1.0 -
             _TweakMatCapOnShadow));
     }
     else
     {
-        Set_MatCap = _Is_LightColor_MatCap_var;
-        _Tweak_MatcapMaskLevel_var_MultiplyMode = _Tweak_MatcapMaskLevel_var;
+        Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var;
+        _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
     }
     //
     //Composition: RimLight and MatCap as finalColor
@@ -526,7 +430,7 @@
     float3 matCapColorFinal;
     if (_Is_BlendAddToMatCap)
     {
-        float3 matCapColorOnAddMode = _RimLight_var + Set_MatCap * _Tweak_MatcapMaskLevel_var;
+        float3 matCapColorOnAddMode = _RimLight_var + Set_MatCap * uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
         matCapColorFinal = matCapColorOnAddMode;
     }
     else
@@ -593,7 +497,7 @@
             _Is_PingPong_Base_var = _base_Speed_var;
         }
         float2 scrolledUV = emissive_uv - float2(_Scroll_EmissiveU, _Scroll_EmissiveV)*_Is_PingPong_Base_var;
-        float rotateVelocity = _Rotate_EmissiveUV*PI;
+        float rotateVelocity = _Rotate_EmissiveUV*UNITY_PI;
         float2 _rotate_EmissiveUV_var = RotateUV(scrolledUV, rotateVelocity, float2(0.5, 0.5), _Is_PingPong_Base_var);
         float4 _Emissive_Tex_var = tex2D(_Emissive_Tex,TRANSFORM_TEX(Set_UV0, _Emissive_Tex));
         float emissiveMask = _Emissive_Tex_var.a;

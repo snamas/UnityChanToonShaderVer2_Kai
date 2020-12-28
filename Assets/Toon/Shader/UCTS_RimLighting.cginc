@@ -1,4 +1,4 @@
-#include <HLSLSupport.cginc>
+
 uniform float4 _RimLightColor;
 uniform fixed _Is_LightColor_RimLight;
 uniform float _RimLight_Power;
