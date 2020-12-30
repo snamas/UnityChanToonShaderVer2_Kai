@@ -1,4 +1,7 @@
 #include "UCTS_Function.cginc"
+
+//v.2.0.5
+uniform fixed _Is_Ortho;
 uniform sampler2D _MatCap_Sampler; uniform float4 _MatCap_Sampler_ST;
 uniform float4 _MatCapColor;
 uniform fixed _Is_LightColor_MatCap;
@@ -19,31 +22,30 @@ struct UTSMatCapStruct
     float _Tweak_MatcapMaskLevel_var;
 };
 
-UTSMatCapStruct MatCapColorCalc(float2 Set_UV0,float _sign_Mirror,float2 _ViewNormalAsMatCapUV,float3 Set_LightColor){
-    float3 _Camera_Right = UNITY_MATRIX_V[0].xyz;
-    float3 _Camera_Front = UNITY_MATRIX_V[2].xyz;
-    float3 _Up_Unit = float3(0, 1, 0);
-    float3 _Right_Axis = cross(_Camera_Front, _Up_Unit);
-    //鏡の中なら反転.
-    if (_sign_Mirror < 0)
+UTSMatCapStruct MatCapColorCalc(float2 Set_UV0,float _sign_Mirror,CameraRollDirStruct camera_roll_dir_struct,float3 viewNormal,float3 viewDirection,float3 Set_LightColor){
+    
+    float3 NormalBlend_MatcapUV_Detail = viewNormal.rgb * float3(-1, -1, 1);
+    float3 NormalBlend_MatcapUV_Base = UTS_UnityWorldToViewDir(viewDirection) * float3(-1, -1, 1) + float3(0, 0, 1);
+        
+    float3 noSknewViewNormal = NormalBlend_MatcapUV_Base * dot(NormalBlend_MatcapUV_Base, NormalBlend_MatcapUV_Detail) /
+        NormalBlend_MatcapUV_Base.b - NormalBlend_MatcapUV_Detail;
+    float2 _ViewNormalAsMatCapUV;
+    if (_Is_Ortho)
     {
-        _Right_Axis = -1 * _Right_Axis;
-        _Rotate_MatCapUV = -1 * _Rotate_MatCapUV;
+        _ViewNormalAsMatCapUV = viewNormal.xy * 0.5 + 0.5;
     }
     else
     {
-        _Right_Axis = _Right_Axis;
+        _ViewNormalAsMatCapUV = noSknewViewNormal.xy * 0.5 + 0.5;
     }
-    //_Camera_Right_Magnitudeは常に１になる。謎
-    float _Camera_Right_Magnitude = length(_Camera_Right.xyz);
-    float _Right_Axis_Magnitude = length(_Right_Axis.xyz);
-    float _Camera_Roll_Cos = dot(_Right_Axis, _Camera_Right) / (_Right_Axis_Magnitude * _Camera_Right_Magnitude);
-    float _Camera_Roll = acos(clamp(_Camera_Roll_Cos, -1, 1));
-    fixed _Camera_Dir = _Camera_Right.y < 0 ? -1 : 1;
+    if (_sign_Mirror < 0)
+    {
+        _Rotate_MatCapUV = -1 * _Rotate_MatCapUV;
+    }
     float _Rot_MatCapUV_var_ang;
     if (_CameraRolling_Stabilizer)
     {
-        _Rot_MatCapUV_var_ang = _Rotate_MatCapUV * 3.141592654 - _Camera_Dir * _Camera_Roll;
+        _Rot_MatCapUV_var_ang = _Rotate_MatCapUV * 3.141592654 - camera_roll_dir_struct._Camera_Dir * camera_roll_dir_struct._Camera_Roll;
     }
     else
     {
@@ -59,10 +61,6 @@ UTSMatCapStruct MatCapColorCalc(float2 Set_UV0,float _sign_Mirror,float2 _ViewNo
     if (_sign_Mirror < 0)
     {
         _Rot_MatCapUV_var.x = 1 - _Rot_MatCapUV_var.x;
-    }
-    else
-    {
-        _Rot_MatCapUV_var = _Rot_MatCapUV_var;
     }
     //v.2.0.6 : LOD of Matcap
     float4 _MatCap_Sampler_var = tex2Dlod(_MatCap_Sampler,

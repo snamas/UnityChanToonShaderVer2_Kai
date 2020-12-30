@@ -49,8 +49,6 @@
             uniform float _Rotate_NormalMapForMatCapUV;
             uniform fixed _Is_UseTweakMatCapOnShadow;
             uniform float _TweakMatCapOnShadow;
-            //v.2.0.5
-            uniform fixed _Is_Ortho;
             //v.2.0.6
             uniform float _BumpScale;
             uniform float _BumpScaleMatcap;
@@ -181,11 +179,10 @@
 
 //v.2.0.4
 #ifdef _IS_PASS_FWDBASE
-
-                float3 defaultLightDirection = normalize(UNITY_MATRIX_V[2].xyz + UNITY_MATRIX_V[1].xyz);
-                //v.2.0.5
-                float3 defaultLightColor = saturate(max(half3(0.05,0.05,0.05)*_Unlit_Intensity,max(ShadeSH9(half4(0.0, 0.0, 0.0, 1.0)),ShadeSH9(half4(0.0, -1.0, 0.0, 1.0)).rgb)*_Unlit_Intensity));
-                float3 customLightDirection = normalize(mul( unity_ObjectToWorld, float4(((float3(1.0,0.0,0.0)*_Offset_X_Axis_BLD*10)+(float3(0.0,1.0,0.0)*_Offset_Y_Axis_BLD*10)+(float3(0.0,0.0,-1.0)*lerp(-1.0,1.0,_Inverse_Z_Axis_BLD))),0)).xyz);
+    float3 defaultLightDirection = normalize(UNITY_MATRIX_V[2].xyz + UNITY_MATRIX_V[1].xyz);
+    //v.2.0.5
+    float3 defaultLightColor = saturate(max(half3(0.05,0.05,0.05)*_Unlit_Intensity,max(ShadeSH9(half4(0.0, 0.0, 0.0, 1.0)),ShadeSH9(half4(0.0, -1.0, 0.0, 1.0)).rgb)*_Unlit_Intensity));
+    float3 customLightDirection = normalize(mul( unity_ObjectToWorld, float4(((float3(1.0,0.0,0.0)*_Offset_X_Axis_BLD*10)+(float3(0.0,1.0,0.0)*_Offset_Y_Axis_BLD*10)+(float3(0.0,0.0,-1.0)*lerp(-1.0,1.0,_Inverse_Z_Axis_BLD))),0)).xyz);
     float3 lightDirection;
     if (any(_WorldSpaceLightPos0.xyz))
     {
@@ -212,10 +209,10 @@
         lightColor = max(defaultLightColor, _LightColor0.rgb);
     }
 #elif _IS_PASS_FWDDELTA
-                float3 lightDirection = normalize(lerp(_WorldSpaceLightPos0.xyz, _WorldSpaceLightPos0.xyz - i.posWorld.xyz,_WorldSpaceLightPos0.w));
-                //v.2.0.5: 
-                float3 addPassLightColor = (0.5*dot(lerp( i.normalDir, normalDirection, _Is_NormalMapToBase ), lightDirection)+0.5) * _LightColor0.rgb * attenuation;
-                float pureIntencity = max(0.001,(0.299*_LightColor0.r + 0.587*_LightColor0.g + 0.114*_LightColor0.b));
+    float3 lightDirection = normalize(lerp(_WorldSpaceLightPos0.xyz, _WorldSpaceLightPos0.xyz - i.posWorld.xyz,_WorldSpaceLightPos0.w));
+    //v.2.0.5: 
+    float3 addPassLightColor = (0.5*dot(lerp( i.normalDir, normalDirection, _Is_NormalMapToBase ), lightDirection)+0.5) * _LightColor0.rgb * attenuation;
+    float pureIntencity = max(0.001,(0.299*_LightColor0.r + 0.587*_LightColor0.g + 0.114*_LightColor0.b));
     float3 lightColor;
     if(_Is_Filter_LightColor)
     {
@@ -226,13 +223,13 @@
     }
 #endif
 ////// Lighting:
-                float3 halfDirection = normalize(viewDirection+lightDirection);
-                //v.2.0.5
-                _Color = _BaseColor;
+    float3 halfDirection = normalize(viewDirection+lightDirection);
+    //v.2.0.5
+    _Color = _BaseColor;
 
 #ifdef _IS_PASS_FWDBASE
-                float3 Set_LightColor = lightColor.rgb;
-                float3 Set_BaseColor;
+    float3 Set_LightColor = lightColor.rgb;
+    float3 Set_BaseColor;
     if (_Is_LightColor_Base)
     {
         Set_BaseColor = (_BaseColor.rgb * _MainTex_var.rgb) * Set_LightColor;
@@ -341,22 +338,22 @@
     float3 Set_HighColor = UTSHighColorBlend(uts_high_color_out,Set_FinalBaseColor);
     
     
-    
-    float _RimArea_var;
-    if (_Is_NormalMapToRimLight)
-    {
-        _RimArea_var = 1.0 - dot(normalDirection, viewDirection);
-    }
-    else
-    {
-        _RimArea_var = 1.0 - dot(i.normalDir, viewDirection);
-    }
-    float _VertHalfLambert_var = saturate(0.5 * dot(i.normalDir, lightDirection) + 0.5);
-    float3 Set_RimLight = UTSRimLightCalc( Set_UV0, _RimArea_var, _VertHalfLambert_var, Set_LightColor);
     //Composition: HighColor and RimLight as _RimLight_var
     float3 _RimLight_var;
+    float3 Set_RimLight;
     if (_RimLight)
     {
+        float _RimArea_var;
+        if (_Is_NormalMapToRimLight)
+        {
+            _RimArea_var = 1.0 - dot(normalDirection, viewDirection);
+        }
+        else
+        {
+            _RimArea_var = 1.0 - dot(i.normalDir, viewDirection);
+        }
+        float _VertHalfLambert_var = saturate(0.5 * dot(i.normalDir, lightDirection) + 0.5);
+        Set_RimLight = UTSRimLightCalc( Set_UV0, _RimArea_var, _VertHalfLambert_var, Set_LightColor);
         _RimLight_var = Set_HighColor + Set_RimLight;
     }
     else
@@ -365,88 +362,75 @@
     }
 
     
-    //Matcap
-    //v.2.0.6 : CameraRolling Stabilizer
-    //鏡スクリプト判定：_sign_Mirror = -1 なら、鏡の中と判定.
-    //v.2.0.7
     fixed _sign_Mirror = i.mirrorFlag;
-    //
-    float2 _Rot_MatCapNmUV_var = RotateUV(Set_UV0, (_Rotate_NormalMapForMatCapUV * 3.141592654), float2(0.5, 0.5), 1.0);
-    //V.2.0.6
-    float3 _NormalMapForMatCap_var = UnpackScaleNormal(tex2D(_NormalMapForMatCap,TRANSFORM_TEX(_Rot_MatCapNmUV_var, _NormalMapForMatCap)),_BumpScaleMatcap);
-    //v.2.0.5: MatCap with camera skew correction
-    float3 viewNormal;
-    if (_Is_NormalMapForMatCap)
-    {
-        viewNormal = UTS_UnityWorldToViewDir(mul(_NormalMapForMatCap_var.rgb, tangentTransform));
-        
-    }
-    else
-    {
-        viewNormal = UTS_UnityWorldToViewDir(i.normalDir);
-    }
-    float3 NormalBlend_MatcapUV_Detail = viewNormal.rgb * float3(-1, -1, 1);
-    float3 NormalBlend_MatcapUV_Base = UTS_UnityWorldToViewDir(viewDirection) * float3(-1, -1, 1) + float3(0, 0, 1);
-    
-    float3 noSknewViewNormal = NormalBlend_MatcapUV_Base * dot(NormalBlend_MatcapUV_Base, NormalBlend_MatcapUV_Detail) /
-        NormalBlend_MatcapUV_Base.b - NormalBlend_MatcapUV_Detail;
-    float2 _ViewNormalAsMatCapUV;
-    if (_Is_Ortho)
-    {
-        _ViewNormalAsMatCapUV = viewNormal.xy * 0.5 + 0.5;
-    }
-    else
-    {
-        _ViewNormalAsMatCapUV = noSknewViewNormal.xy * 0.5 + 0.5;
-    }
-    UTSMatCapStruct uts_mat_cap_struct = MatCapColorCalc( Set_UV0, _sign_Mirror, _ViewNormalAsMatCapUV, Set_LightColor);
-    
-    //v.2.0.6 : ShadowMask on Matcap in Blend mode : multiply
-    float3 Set_MatCap;
-    float _Tweak_MatcapMaskLevel_var_MultiplyMode;
-    if (_Is_UseTweakMatCapOnShadow)
-    {
-        if (_Is_BlendAddToMatCap)
-        {
-            Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask);
-        }
-        else
-        {
-            Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask) + Set_HighColor
-                * Set_FinalShadowMask * (1.0 - _TweakMatCapOnShadow);
-        }
-        _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var * (1.0 - Set_FinalShadowMask * (1.0 -
-            _TweakMatCapOnShadow));
-    }
-    else
-    {
-        Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var;
-        _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
-    }
-    //
-    //Composition: RimLight and MatCap as finalColor
-    //Broke down finalColor composition
-
-    float3 matCapColorFinal;
-    if (_Is_BlendAddToMatCap)
-    {
-        float3 matCapColorOnAddMode = _RimLight_var + Set_MatCap * uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
-        matCapColorFinal = matCapColorOnAddMode;
-    }
-    else
-    {
-        if (_RimLight)
-        {
-            matCapColorFinal = lerp(Set_HighColor, Set_HighColor * Set_MatCap, _Tweak_MatcapMaskLevel_var_MultiplyMode) + Set_RimLight;
-        }
-        else
-        {
-            matCapColorFinal = lerp(Set_HighColor, Set_HighColor * Set_MatCap, _Tweak_MatcapMaskLevel_var_MultiplyMode);
-        }
-    }
+    CameraRollDirStruct camera_roll_dir_struct = CameraRollDirCalc(_sign_Mirror);
+   
     float3 finalColor; // Final Composition before Emissive
     if (_MatCap)
-    {
+    {   //Matcap
+        //v.2.0.6 : CameraRolling Stabilizer
+        //鏡スクリプト判定：_sign_Mirror = -1 なら、鏡の中と判定.
+        //v.2.0.7
+        //
+        float2 _Rot_MatCapNmUV_var = RotateUV(Set_UV0, (_Rotate_NormalMapForMatCapUV * 3.141592654), float2(0.5, 0.5), 1.0);
+        //V.2.0.6
+        float3 _NormalMapForMatCap_var = UnpackScaleNormal(tex2D(_NormalMapForMatCap,TRANSFORM_TEX(_Rot_MatCapNmUV_var, _NormalMapForMatCap)),_BumpScaleMatcap);
+        //v.2.0.5: MatCap with camera skew correction
+        float3 viewNormal;
+        if (_Is_NormalMapForMatCap)
+        {
+            viewNormal = UTS_UnityWorldToViewDir(mul(_NormalMapForMatCap_var.rgb, tangentTransform));
+            
+        }
+        else
+        {
+            viewNormal = UTS_UnityWorldToViewDir(i.normalDir);
+        }
+        UTSMatCapStruct uts_mat_cap_struct = MatCapColorCalc( Set_UV0, _sign_Mirror,camera_roll_dir_struct,  viewNormal, viewDirection, Set_LightColor);
+        
+        //v.2.0.6 : ShadowMask on Matcap in Blend mode : multiply
+        
+        //
+        //Composition: RimLight and MatCap as finalColor
+        //Broke down finalColor composition
+        float3 Set_MatCap;
+        float3 matCapColorFinal;
+        if (_Is_BlendAddToMatCap)
+        {
+            if (_Is_UseTweakMatCapOnShadow)
+            {
+                Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask);
+            }
+            else
+            {
+                Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var;
+            }
+            float3 matCapColorOnAddMode = Set_MatCap * uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
+            matCapColorFinal = matCapColorOnAddMode + _RimLight_var;
+        }else
+        {
+            float _Tweak_MatcapMaskLevel_var_MultiplyMode;
+            if (_Is_UseTweakMatCapOnShadow)
+            {
+                Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var * lerp(1, _TweakMatCapOnShadow, Set_FinalShadowMask) + Set_HighColor
+                    * Set_FinalShadowMask * (1.0 - _TweakMatCapOnShadow);
+                _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var * (1.0 - Set_FinalShadowMask * (1.0 -
+                    _TweakMatCapOnShadow));
+            }
+            else
+            {
+                Set_MatCap = uts_mat_cap_struct._Is_LightColor_MatCap_var;
+                _Tweak_MatcapMaskLevel_var_MultiplyMode = uts_mat_cap_struct._Tweak_MatcapMaskLevel_var;
+            }
+            if (_RimLight)
+            {
+                matCapColorFinal = lerp(Set_HighColor, Set_HighColor * Set_MatCap, _Tweak_MatcapMaskLevel_var_MultiplyMode) + Set_RimLight;
+            }
+            else
+            {
+                matCapColorFinal = lerp(Set_HighColor, Set_HighColor * Set_MatCap, _Tweak_MatcapMaskLevel_var_MultiplyMode);
+            }
+        }
         finalColor = matCapColorFinal;
     }
     else
@@ -465,12 +449,12 @@
         emissive = _Emissive_Tex_var.rgb * _Emissive_Color.rgb * emissiveMask;
     #elif _EMISSIVE_ANIMATION
         //v.2.0.7 Calculation View Coord UV for Scroll
-        float3 viewNormal_Emissive = TransformWorldToViewDir(i.normalDir);
+        float3 viewNormal_Emissive = UTS_UnityWorldToViewDir(i.normalDir);
         float3 NormalBlend_Emissive_Detail = viewNormal_Emissive * float3(-1,-1,1);
-        float3 NormalBlend_Emissive_Base = TransformWorldToViewDir( viewDirection) * float3(-1,-1,1) + float3(0,0,1);
+        float3 NormalBlend_Emissive_Base = UTS_UnityWorldToViewDir( viewDirection) * float3(-1,-1,1) + float3(0,0,1);
         float3 noSknewViewNormal_Emissive = NormalBlend_Emissive_Base*dot(NormalBlend_Emissive_Base, NormalBlend_Emissive_Detail)/NormalBlend_Emissive_Base.z - NormalBlend_Emissive_Detail;
         float2 _ViewNormalAsEmissiveUV = noSknewViewNormal_Emissive.xy * 0.5 + 0.5;
-        float2 _ViewCoord_UV = RotateUV(_ViewNormalAsEmissiveUV, -(_Camera_Dir*_Camera_Roll), float2(0.5,0.5), 1.0);
+        float2 _ViewCoord_UV = RotateUV(_ViewNormalAsEmissiveUV, -(camera_roll_dir_struct._Camera_Dir*camera_roll_dir_struct._Camera_Roll), float2(0.5,0.5), 1.0);
         //鏡の中ならUV左右反転.
         if(_sign_Mirror < 0){
             _ViewCoord_UV.x = 1-_ViewCoord_UV.x;
@@ -530,11 +514,11 @@
 
 #elif _IS_PASS_FWDDELTA
                 //v.2.0.5:
-                _BaseColor_Step = saturate(_BaseColor_Step + _StepOffset);
-                _ShadeColor_Step = saturate(_ShadeColor_Step + _StepOffset);
-                //
-                //v.2.0.5: If Added lights is directional, set 0 as _LightIntensity
-                float _LightIntensity;
+    _BaseColor_Step = saturate(_BaseColor_Step + _StepOffset);
+    _ShadeColor_Step = saturate(_ShadeColor_Step + _StepOffset);
+    //
+    //v.2.0.5: If Added lights is directional, set 0 as _LightIntensity
+    float _LightIntensity;
     if(_WorldSpaceLightPos0.w)
     {
         _LightIntensity = (0.299*_LightColor0.r + 0.587*_LightColor0.g + 0.114*_LightColor0.b)*attenuation;
@@ -543,100 +527,102 @@
         _LightIntensity = 0;
     }
                 //v.2.0.5: Filtering the high intensity zone of PointLights
-        float3 Set_LightColor;
-        if(_Is_Filter_HiCutPointLightColor)
-        {
-            Set_LightColor = lerp(lightColor,min(lightColor,_LightColor0.rgb*attenuation*_BaseColor_Step),_WorldSpaceLightPos0.w);
-        }else
-        {
-            Set_LightColor = lightColor;
-        }
-    //
-                float3 Set_BaseColor;
-        if(_Is_LightColor_Base)
-        {
-            Set_BaseColor =  _BaseColor.rgb*_MainTex_var.rgb*Set_LightColor;
-        }else
-        {
-            Set_BaseColor = _BaseColor.rgb*_MainTex_var.rgb*_LightIntensity;
-        }
-        //v.2.0.5
-        float4 _1st_ShadeMap_var;
-        if (_Use_BaseAs1st)
-        {
-            _1st_ShadeMap_var = _MainTex_var;
-        }else
-        {
-            _1st_ShadeMap_var = tex2D(_1st_ShadeMap,TRANSFORM_TEX(Set_UV0, _1st_ShadeMap));
-        }
-        float3 Set_1st_ShadeColor;
-        if(_Is_LightColor_1st_Shade)
-        {
-            Set_1st_ShadeColor = _1st_ShadeColor.rgb*_1st_ShadeMap_var.rgb*Set_LightColor;
-        }else
-        {
-            Set_1st_ShadeColor = _1st_ShadeColor.rgb*_1st_ShadeMap_var.rgb*_LightIntensity;
-        }
-        //v.2.0.5
-        float4 _2nd_ShadeMap_var;
-        if(_Use_1stAs2nd)
-        {
-            _2nd_ShadeMap_var = _1st_ShadeMap_var;
-        }else
-        {
-            _2nd_ShadeMap_var = tex2D(_2nd_ShadeMap,TRANSFORM_TEX(Set_UV0, _2nd_ShadeMap));
-        }
-        float3 Set_2nd_ShadeColor;
-        if(_Is_LightColor_2nd_Shade)
-        {
-            Set_2nd_ShadeColor = _2nd_ShadeColor.rgb*_2nd_ShadeMap_var.rgb*Set_LightColor;
-        }else
-        {
-            Set_2nd_ShadeColor = _2nd_ShadeColor.rgb*_2nd_ShadeMap_var.rgb*_LightIntensity;
-        }
-        float _HalfLambert_var = 0.5*dot(lerp( i.normalDir, normalDirection, _Is_NormalMapToBase ),lightDirection)+0.5;
-        if(_Is_NormalMapToBase)
-        {
-            _HalfLambert_var = 0.5*dot(normalDirection,lightDirection)+0.5;
-        }else
-        {
-            _HalfLambert_var = 0.5*dot(i.normalDir,lightDirection)+0.5;
-        }
-        float4 _Set_2nd_ShadePosition_var = tex2D(_Set_2nd_ShadePosition,TRANSFORM_TEX(Set_UV0, _Set_2nd_ShadePosition));
-        float4 _Set_1st_ShadePosition_var = tex2D(_Set_1st_ShadePosition,TRANSFORM_TEX(Set_UV0, _Set_1st_ShadePosition));
-        //v.2.0.5:
-        float Set_FinalShadowMask;
-        if (_Set_SystemShadowsToBase)
-        {
-            Set_FinalShadowMask = saturate(
-                lerp(
-                    1,
-                    (_BaseColor_Step - _HalfLambert_var * saturate(1.0+_Tweak_SystemShadowsLevel)) / _BaseShade_Feather,
-                    _Set_1st_ShadePosition_var.r
-                )
-            );
-        }
-        else
-        {
-            Set_FinalShadowMask = saturate(
-                lerp(
-                    1,
-                    (_BaseColor_Step - _HalfLambert_var) / _BaseShade_Feather,
-                    _Set_1st_ShadePosition_var.r
-                )
-            );
-        }
-        //Composition: 3 Basic Colors as finalColor
-        float3 finalColor = lerp(Set_BaseColor,
-                                    lerp(Set_1st_ShadeColor, Set_2nd_ShadeColor,
-                                         saturate(
-                                             lerp(1, (_ShadeColor_Step - _HalfLambert_var) / _1st2nd_Shades_Feather,
-                                                  _Set_2nd_ShadePosition_var.r)
-                                         )
-                                    ),
-                                    Set_FinalShadowMask); // Final Color
-        
-        //v.2.0.6: Add HighColor if _Is_Filter_HiCutPointLightColor is False
+    float3 Set_LightColor;
+    if(_Is_Filter_HiCutPointLightColor)
+    {
+        Set_LightColor = lerp(lightColor,min(lightColor,_LightColor0.rgb*attenuation*_BaseColor_Step),_WorldSpaceLightPos0.w);
+    }else
+    {
+        Set_LightColor = lightColor;
+    }
+//
+    float3 Set_BaseColor;
+    if(_Is_LightColor_Base)
+    {
+        Set_BaseColor =  _BaseColor.rgb*_MainTex_var.rgb*Set_LightColor;
+    }else
+    {
+        Set_BaseColor = _BaseColor.rgb*_MainTex_var.rgb*_LightIntensity;
+    }
+    //v.2.0.5
+    float4 _1st_ShadeMap_var;
+    if (_Use_BaseAs1st)
+    {
+        _1st_ShadeMap_var = _MainTex_var;
+    }else
+    {
+        _1st_ShadeMap_var = tex2D(_1st_ShadeMap,TRANSFORM_TEX(Set_UV0, _1st_ShadeMap));
+    }
+    float3 Set_1st_ShadeColor;
+    if(_Is_LightColor_1st_Shade)
+    {
+        Set_1st_ShadeColor = _1st_ShadeColor.rgb*_1st_ShadeMap_var.rgb*Set_LightColor;
+    }else
+    {
+        Set_1st_ShadeColor = _1st_ShadeColor.rgb*_1st_ShadeMap_var.rgb*_LightIntensity;
+    }
+    //v.2.0.5
+    float4 _2nd_ShadeMap_var;
+    if(_Use_1stAs2nd)
+    {
+        _2nd_ShadeMap_var = _1st_ShadeMap_var;
+    }else
+    {
+        _2nd_ShadeMap_var = tex2D(_2nd_ShadeMap,TRANSFORM_TEX(Set_UV0, _2nd_ShadeMap));
+    }
+    float3 Set_2nd_ShadeColor;
+    if(_Is_LightColor_2nd_Shade)
+    {
+        Set_2nd_ShadeColor = _2nd_ShadeColor.rgb*_2nd_ShadeMap_var.rgb*Set_LightColor;
+    }else
+    {
+        Set_2nd_ShadeColor = _2nd_ShadeColor.rgb*_2nd_ShadeMap_var.rgb*_LightIntensity;
+    }
+    float _HalfLambert_var = 0.5*dot(lerp( i.normalDir, normalDirection, _Is_NormalMapToBase ),lightDirection)+0.5;
+    if(_Is_NormalMapToBase)
+    {
+        _HalfLambert_var = 0.5*dot(normalDirection,lightDirection)+0.5;
+    }else
+    {
+        _HalfLambert_var = 0.5*dot(i.normalDir,lightDirection)+0.5;
+    }
+    float4 _Set_2nd_ShadePosition_var = tex2D(_Set_2nd_ShadePosition,TRANSFORM_TEX(Set_UV0, _Set_2nd_ShadePosition));
+    float4 _Set_1st_ShadePosition_var = tex2D(_Set_1st_ShadePosition,TRANSFORM_TEX(Set_UV0, _Set_1st_ShadePosition));
+    //v.2.0.5:
+    float Set_FinalShadowMask;
+    if (_Set_SystemShadowsToBase)
+    {
+        Set_FinalShadowMask = saturate(
+            lerp(
+                1,
+                (_BaseColor_Step - _HalfLambert_var * saturate(1.0+_Tweak_SystemShadowsLevel)) / _BaseShade_Feather,
+                _Set_1st_ShadePosition_var.r
+            )
+        );
+    }
+    else
+    {
+        Set_FinalShadowMask = saturate(
+            lerp(
+                1,
+                (_BaseColor_Step - _HalfLambert_var) / _BaseShade_Feather,
+                _Set_1st_ShadePosition_var.r
+            )
+        );
+    }
+    //Composition: 3 Basic Colors as finalColor
+    float3 finalColor = lerp(Set_BaseColor,
+                                lerp(Set_1st_ShadeColor, Set_2nd_ShadeColor,
+                                     saturate(
+                                         lerp(1, (_ShadeColor_Step - _HalfLambert_var) / _1st2nd_Shades_Feather,
+                                              _Set_2nd_ShadePosition_var.r)
+                                     )
+                                ),
+                                Set_FinalShadowMask); // Final Color
+    
+    //v.2.0.6: Add HighColor if _Is_Filter_HiCutPointLightColor is False
+    if(!_Is_Filter_HiCutPointLightColor)
+    {
         float _Specular_var; //  Specular
         if(_Is_NormalMapToHighColor)
         {
@@ -647,11 +633,10 @@
             _Specular_var = 0.5*dot(halfDirection, i.normalDir)+0.5;
         }//  Specular
         UTSHighColorStruct uts_high_color_out = UTSHighColorCalc(Set_UV0,_Specular_var,Set_LightColor,Set_FinalShadowMask);
-        if(!_Is_Filter_HiCutPointLightColor)
-        {
-            finalColor += uts_high_color_out.add_HighColor_var;
-        }
-                finalColor = saturate(finalColor);
+        
+        finalColor += uts_high_color_out.add_HighColor_var;
+    }
+    finalColor = saturate(finalColor);
 #endif
 
 
