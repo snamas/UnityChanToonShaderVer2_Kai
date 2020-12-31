@@ -154,9 +154,9 @@ Shader "UnityChanToonShader_kai/Mobile/Toon_ShadingGradeMap_StencilOut" {
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_StencilOut/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_StencilOut/FORWARD"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_StencilOut/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_StencilOut/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_StencilOut/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_StencilOut/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"

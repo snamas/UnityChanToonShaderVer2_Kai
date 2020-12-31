@@ -152,9 +152,9 @@ Shader "UnityChanToonShader_kai/Mobile/Toon_DoubleShadeWithFeather_StencilMask" 
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_StencilMask/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_StencilMask/FORWARD"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_StencilMask/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_StencilMask/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_StencilMask/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_StencilMask/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"

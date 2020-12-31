@@ -159,9 +159,9 @@ Shader "UnityChanToonShader_kai/Mobile/Toon_DoubleShadeWithFeather_Clipping_Sten
             "RenderType"="TransparentCutout"
         }
 
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping_StencilMask/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping_StencilMask/FORWARD"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping_StencilMask/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping_StencilMask/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping_StencilMask/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping_StencilMask/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

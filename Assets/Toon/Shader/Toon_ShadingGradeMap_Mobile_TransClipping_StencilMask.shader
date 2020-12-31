@@ -160,9 +160,9 @@ Shader "UnityChanToonShader_kai/Mobile/Toon_ShadingGradeMap_TransClipping_Stenci
             "RenderType"="TransparentCutout"
         }
 
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilMask/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilMask/FORWARD"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilMask/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilMask/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilMask/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilMask/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

@@ -148,9 +148,9 @@ Shader "UnityChanToonShader_kai/NoOutline/AngelRing/ToonColor_ShadingGradeMap" {
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/AngelRing/Toon_ShadingGradeMap/FORWARD"
-        UsePass "UnityChanToonShader/AngelRing/Toon_ShadingGradeMap/FORWARD_DELTA"
-        UsePass "UnityChanToonShader/AngelRing/Toon_ShadingGradeMap/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/AngelRing/Toon_ShadingGradeMap/FORWARD"
+        UsePass "UnityChanToonShader_kai/AngelRing/Toon_ShadingGradeMap/FORWARD_DELTA"
+        UsePass "UnityChanToonShader_kai/AngelRing/Toon_ShadingGradeMap/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"

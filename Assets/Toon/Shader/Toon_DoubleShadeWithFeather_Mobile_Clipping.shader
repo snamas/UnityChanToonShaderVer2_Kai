@@ -158,9 +158,9 @@ Shader "UnityChanToonShader_kai/Mobile/Toon_DoubleShadeWithFeather_Clipping" {
             "RenderType"="TransparentCutout"
         }
 
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping/FORWARD"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather_Clipping/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather_Clipping/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

@@ -147,9 +147,9 @@ Shader "UnityChanToonShader_kai/NoOutline/ToonColor_ShadingGradeMap_TransClippin
             "RenderType"="TransparentCutout"
         }
 
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilOut/FORWARD"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilOut/FORWARD_DELTA"
-        UsePass "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping_StencilOut/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilOut/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilOut/FORWARD_DELTA"
+        UsePass "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping_StencilOut/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"
