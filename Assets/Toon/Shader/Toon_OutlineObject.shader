@@ -3,7 +3,7 @@
 //nobuyuki@unity3d.com
 //https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project
 //(C)Unity Technologies Japan/UCL
-Shader "UnityChanToonShader/Helper/Toon_OutlineObject" {
+Shader "UnityChanToonShader_kai/Helper/Toon_OutlineObject" {
     Properties {
         [HideInInspector] _simpleUI ("SimpleUI", Int ) = 0
         [HideInInspector] _utsVersion ("Version", Float ) = 2.07

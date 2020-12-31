@@ -3,7 +3,7 @@
 //nobuyuki@unity3d.com
 //https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project
 //(C)Unity Technologies Japan/UCL
-Shader "UnityChanToonShader/Toon_ShadingGradeMap_TransClipping" {
+Shader "UnityChanToonShader_kai/Toon_ShadingGradeMap_TransClipping" {
     Properties {
         [HideInInspector] _simpleUI ("SimpleUI", Int ) = 0
         [HideInInspector] _utsVersion ("Version", Float ) = 2.07

@@ -3,7 +3,7 @@
 //nobuyuki@unity3d.com
 //https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project
 //(C)Unity Technologies Japan/UCL
-Shader "UnityChanToonShader/Mobile/Toon_DoubleShadeWithFeather" {
+Shader "UnityChanToonShader_kai/Mobile/Toon_DoubleShadeWithFeather" {
     Properties {
         [HideInInspector] _simpleUI ("SimpleUI", Int ) = 0
         [HideInInspector] _utsVersion ("Version", Float ) = 2.07
@@ -150,9 +150,9 @@ Shader "UnityChanToonShader/Mobile/Toon_DoubleShadeWithFeather" {
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather/OUTLINE"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather/FORWARD"
-        UsePass "UnityChanToonShader/Toon_DoubleShadeWithFeather/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather/FORWARD"
+        UsePass "UnityChanToonShader_kai/Toon_DoubleShadeWithFeather/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

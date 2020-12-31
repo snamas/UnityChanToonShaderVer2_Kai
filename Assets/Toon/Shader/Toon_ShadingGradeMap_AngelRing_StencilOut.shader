@@ -3,7 +3,7 @@
 //nobuyuki@unity3d.com
 //https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project
 //(C)Unity Technologies Japan/UCL
-Shader "UnityChanToonShader/AngelRing/Toon_ShadingGradeMap_StencilOut" {
+Shader "UnityChanToonShader_kai/AngelRing/Toon_ShadingGradeMap_StencilOut" {
     Properties {
         [HideInInspector] _simpleUI ("SimpleUI", Int ) = 0
         [HideInInspector] _utsVersion ("Version", Float ) = 2.07

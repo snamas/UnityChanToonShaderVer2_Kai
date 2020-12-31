@@ -3,7 +3,7 @@
 //nobuyuki@unity3d.com
 //https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project
 //(C)Unity Technologies Japan/UCL
-Shader "UnityChanToonShader/Mobile/AngelRing/Toon_ShadingGradeMap" {
+Shader "UnityChanToonShader_kai/Mobile/AngelRing/Toon_ShadingGradeMap" {
     Properties {
         [HideInInspector] _simpleUI ("SimpleUI", Int ) = 0
         [HideInInspector] _utsVersion ("Version", Float ) = 2.07
