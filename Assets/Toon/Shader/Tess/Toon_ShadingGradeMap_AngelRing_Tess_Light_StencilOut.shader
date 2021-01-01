@@ -168,9 +168,9 @@ Shader "UnityChanToonShader_kai/Tessellation/Light/AngelRing/Toon_ShadingGradeMa
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/OUTLINE"
-        UsePass "UnityChanToonShader/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/FORWARD"
-        UsePass "UnityChanToonShader/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/FORWARD"
+        UsePass "UnityChanToonShader_kai/Tessellation/AngelRing/Toon_ShadingGradeMap_StencilOut/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"

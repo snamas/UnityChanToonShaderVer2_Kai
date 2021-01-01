@@ -72,7 +72,7 @@
                 //ここまで.
                 float Set_Outline_Width = (_Outline_Width*0.001*smoothstep( _Farthest_Distance, _Nearest_Distance, distance(objPos.rgb,_WorldSpaceCameraPos) )*_Outline_Sampler_var.rgb).r;
                 //v.2.0.7.5
-                float4 _ClipCameraPos = mul(UNITY_MATRIX_VP, float4(_WorldSpaceCameraPos.xyz, 1));
+                float4 _ClipCameraPos = UnityWorldToClipPos(_WorldSpaceCameraPos.xyz);
                 //v.2.0.7
                 #if defined(UNITY_REVERSED_Z)
                     //v.2.0.4.2 (DX)
@@ -84,7 +84,13 @@
 //v2.0.4
 #ifdef _OUTLINE_NML
                 //v.2.0.4.3 baked Normal Texture for Outline
-                o.pos = UnityObjectToClipPos(lerp(float4(v.vertex.xyz + v.normal*Set_Outline_Width,1), float4(v.vertex.xyz + _BakedNormalDir*Set_Outline_Width,1),_Is_BakedNormal));
+                if(_Is_BakedNormal)
+                {
+                    o.pos = UnityObjectToClipPos(float4(v.vertex.xyz + Set_Outline_Width*_BakedNormalDir,1));
+                }else
+                {
+                    o.pos = UnityObjectToClipPos(float4(v.vertex.xyz + Set_Outline_Width*v.normal,1));
+                }
 #elif _OUTLINE_POS
                 Set_Outline_Width = Set_Outline_Width*2;
                 float signVar = dot(normalize(v.vertex),normalize(v.normal))<0 ? -1 : 1;
@@ -107,21 +113,56 @@
                 float2 Set_UV0 = i.uv0;
                 float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(Set_UV0, _MainTex));
                 float3 Set_BaseColor = _BaseColor.rgb*_MainTex_var.rgb;
-                float3 _Is_BlendBaseColor_var = lerp( _Outline_Color.rgb*lightColor, (_Outline_Color.rgb*Set_BaseColor*Set_BaseColor*lightColor), _Is_BlendBaseColor );
+                float3 _Is_BlendBaseColor_var;
+                if(_Is_BlendBaseColor)
+                {
+                    _Is_BlendBaseColor_var =  _Outline_Color.rgb*lightColor*Set_BaseColor*Set_BaseColor;
+                }else
+                {
+                    _Is_BlendBaseColor_var =  _Outline_Color.rgb*lightColor;
+                }
                 //
                 float3 _OutlineTex_var = tex2D(_OutlineTex,TRANSFORM_TEX(Set_UV0, _OutlineTex));
 //v.2.0.7.5
 #ifdef _IS_OUTLINE_CLIPPING_NO
-                float3 Set_Outline_Color = lerp(_Is_BlendBaseColor_var, _OutlineTex_var.rgb*_Outline_Color.rgb*lightColor, _Is_OutlineTex );
+                float3 Set_Outline_Color;
+                if(_Is_OutlineTex)
+                {
+                    Set_Outline_Color = _OutlineTex_var.rgb*_Outline_Color.rgb*lightColor;
+                }else
+                {
+                    Set_Outline_Color = _Is_BlendBaseColor_var;
+                }
                 return float4(Set_Outline_Color,1.0);
 #elif _IS_OUTLINE_CLIPPING_YES
                 float4 _ClippingMask_var = tex2D(_ClippingMask,TRANSFORM_TEX(Set_UV0, _ClippingMask));
                 float Set_MainTexAlpha = _MainTex_var.a;
-                float _IsBaseMapAlphaAsClippingMask_var = lerp( _ClippingMask_var.r, Set_MainTexAlpha, _IsBaseMapAlphaAsClippingMask );
-                float _Inverse_Clipping_var = lerp( _IsBaseMapAlphaAsClippingMask_var, (1.0 - _IsBaseMapAlphaAsClippingMask_var), _Inverse_Clipping );
+                float _IsBaseMapAlphaAsClippingMask_var;
+                if(_IsBaseMapAlphaAsClippingMask)
+                {
+                    float _IsBaseMapAlphaAsClippingMask_var = Set_MainTexAlpha;
+                }else
+                {
+                    _IsBaseMapAlphaAsClippingMask_var = _ClippingMask_var.r;
+                }
+                float _Inverse_Clipping_var;
+                if(_Inverse_Clipping)
+                {
+                    _Inverse_Clipping_var =  (1.0 - _IsBaseMapAlphaAsClippingMask_var);
+                }else
+                {
+                    _Inverse_Clipping_var = _IsBaseMapAlphaAsClippingMask_var;
+                }
                 float Set_Clipping = saturate((_Inverse_Clipping_var+_Clipping_Level));
                 clip(Set_Clipping - 0.5);
-                float4 Set_Outline_Color = lerp( float4(_Is_BlendBaseColor_var,Set_Clipping), float4((_OutlineTex_var.rgb*_Outline_Color.rgb*lightColor),Set_Clipping), _Is_OutlineTex );
+                float4 Set_Outline_Color;
+                if(_Is_OutlineTex)
+                {
+                    Set_Outline_Color = float4((_OutlineTex_var.rgb*_Outline_Color.rgb*lightColor),Set_Clipping);
+                }else
+                {
+                    Set_Outline_Color = float4(_Is_BlendBaseColor_var,Set_Clipping);
+                }
                 return Set_Outline_Color;
 #endif
             }

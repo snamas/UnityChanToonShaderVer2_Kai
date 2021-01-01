@@ -155,9 +155,9 @@ Shader "UnityChanToonShader_kai/Tessellation/Light/Toon_DoubleShadeWithFeather" 
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather/OUTLINE"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather/FORWARD"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather/FORWARD"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

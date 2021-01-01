@@ -150,9 +150,9 @@ Shader "UnityChanToonShader_kai/Tessellation/NoOutline/ToonColor_DoubleShadeWith
             "RenderType"="TransparentCutout"
         }
 
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/FORWARD"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/FORWARD_DELTA"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/FORWARD"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/FORWARD_DELTA"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_TransClipping_StencilMask/SHADOWCASTER"
     }
     FallBack "Legacy Shaders/VertexLit"
     CustomEditor "UnityChan.UTS2GUI"

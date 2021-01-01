@@ -146,9 +146,9 @@ Shader "UnityChanToonShader_kai/Tessellation/NoOutline/ToonColor_ShadingGradeMap
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Tessellation/Toon_ShadingGradeMap_StencilMask/FORWARD"
-        UsePass "UnityChanToonShader/Tessellation/Toon_ShadingGradeMap_StencilMask/FORWARD_DELTA"
-        UsePass "UnityChanToonShader/Tessellation/Toon_ShadingGradeMap_StencilMask/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_ShadingGradeMap_StencilMask/FORWARD"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_ShadingGradeMap_StencilMask/FORWARD_DELTA"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_ShadingGradeMap_StencilMask/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"

@@ -157,9 +157,9 @@ Shader "UnityChanToonShader_kai/Tessellation/Light/Toon_DoubleShadeWithFeather_S
             "RenderType"="Opaque"
         }
 
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/OUTLINE"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/FORWARD"
-        UsePass "UnityChanToonShader/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/SHADOWCASTER"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/OUTLINE"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/FORWARD"
+        UsePass "UnityChanToonShader_kai/Tessellation/Toon_DoubleShadeWithFeather_StencilOut/SHADOWCASTER"
 
     }
     FallBack "Legacy Shaders/VertexLit"
