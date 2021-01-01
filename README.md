@@ -6,8 +6,13 @@ UTS2.0改は [ユニティちゃんトゥーンシェーダー 2.0](https://gith
 そのためUTS2.0改はUTS2.0を差し替えても問題なく使用できます。
 
 また、独自解釈した結果、オリジナルのシェーダーに比べDrawingにおいて
-当環境で約１～２％安定して高速にレンダリングできるようになりました。
+若干高速にレンダリングできるようになりました。
 
+-----
+## 【ダウンロード】
+https://github.com/snamas/UnityChanToonShaderVer2_Kai/releases/download/0.9/UTS2_Kai_ShaderOnly.unitypackage
+
+このパッケージは[オリジナルのUTS2.0](https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project) をすでにインポートしている状態を想定しています。
 
 -----
 ## 【ユーザーマニュアル】
